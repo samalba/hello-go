@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
@@ -19,8 +20,14 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal().Msg("PORT is undefined")
+	}
+
 	http.HandleFunc("/", HelloServer)
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal().Err(err).Msg("ListenAndServe")
 	}
 }
