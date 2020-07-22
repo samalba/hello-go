@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
@@ -16,6 +17,16 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 		Stringer("url", r.URL).
 		Msg("")
 	fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
+	if r.URL.RawQuery == "debug" {
+		fmt.Fprintf(w, "\n\n\n-- env:\n\n")
+		for _, e := range os.Environ() {
+			fmt.Fprintf(w, "%s\n", e)
+		}
+		fmt.Fprintf(w, "\n\n-- headers:\n\n")
+		for k, v := range r.Header {
+			fmt.Fprintf(w, "%s: %s\n", k, strings.Join(v, ","))
+		}
+	}
 }
 
 func main() {
