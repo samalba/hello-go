@@ -9,4 +9,6 @@ FROM alpine:3.12@sha256:769fddc7cc2f0a1c35abb2f91432e8beecf83916c421420e6a6da9f8
 COPY --from=builder /go/src/app/hello-go /bin/hello-go
 WORKDIR /app
 
+ENV PORT 80
+
 ENTRYPOINT ["/bin/hello-go"]
