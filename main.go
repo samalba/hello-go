@@ -6,7 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rs/zerolog"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 )
@@ -30,15 +31,19 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal().Msg("PORT is undefined")
+		log.Warn().Msg("PORT is undefined, assuming 80")
+		port = "80"
 	}
 
-	http.HandleFunc("/", HelloServer)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+
+	r.Get("/*", HelloServer)
+	r.Get("/db/{dbPrefix}", TestDB)
+	fmt.Println("Listening to port", port)
+	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal().Err(err).Msg("ListenAndServe")
 	}
 }
