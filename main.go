@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/chyeh/pubip"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/zerolog/hlog"
@@ -26,6 +27,15 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "\n\n-- headers:\n\n")
 		for k, v := range r.Header {
 			fmt.Fprintf(w, "%s: %s\n", k, strings.Join(v, ","))
+		}
+	}
+	if r.URL.RawQuery == "ip" {
+		fmt.Fprintf(w, "\n\n\n-- my public ip: ")
+		ip, err := pubip.Get()
+		if err != nil {
+			fmt.Fprintf(w, "%s\n", err)
+		} else {
+			fmt.Fprintf(w, "%s\n", ip)
 		}
 	}
 }
